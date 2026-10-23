@@ -1,0 +1,33 @@
+# Render Ignore List
+# Ignores files from deployment build to accelerate build and deployment times
+
+# Version Control & IDE
+.git/
+.github/
+.vscode/
+.idea/
+
+# Source assignment documentation & intermediate scripts (not required for runtime UI)
+candidate/
+exports/
+DEMO_RECORDING_SCRIPT.md
+generate_data_and_exports.py
+generate_pptx.py
+
+# Python caches & virtual environments
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+env/
+
+# System & Temporary Files
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.log
+.gemini/
+.agents/
+scratch/

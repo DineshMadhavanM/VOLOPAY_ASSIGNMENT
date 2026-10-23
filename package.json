@@ -1,0 +1,17 @@
+{
+  "name": "volopay-assignment",
+  "version": "1.0.0",
+  "description": "SpendNest Revenue Intelligence Inbox for Volopay Evaluation",
+  "main": "revenue-inbox/server.js",
+  "scripts": {
+    "build": "echo 'Build successful'",
+    "start": "node revenue-inbox/server.js"
+  },
+  "keywords": [
+    "volopay",
+    "revenue-intelligence",
+    "dashboard"
+  ],
+  "author": "DineshMadhavanM",
+  "license": "ISC"
+}

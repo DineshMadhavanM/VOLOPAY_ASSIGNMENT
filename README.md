@@ -25,8 +25,9 @@ Open your browser at **`http://localhost:3000`**.
 ### Option B: Direct Offline Browser Open
 Simply double-click `revenue-inbox/index.html` in your file explorer to open it directly in Google Chrome, Microsoft Edge, or Safari. All styles, icons, datasets, and the JSZip bundling engine run completely offline!
 
-### Option C: Live Deployed Link
-You can deploy this static folder in 1 second to **Vercel**, **Netlify**, or **GitHub Pages** (simply push to GitHub or drag the `revenue-inbox` folder to Netlify Drop).
+### Option C: Live Deployed Application
+The application is live and hosted on Render:
+**👉 [https://volopay-assignment-inqe.onrender.com](https://volopay-assignment-inqe.onrender.com)**
 
 ---
 

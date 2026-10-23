@@ -1,0 +1,40 @@
+================================================================================
+VOLOPAY REVENUE INTELLIGENCE INBOX — FINAL SUBMISSION
+Candidate Name: Dinesh Madhavan M
+College / Placement Process: Volopay Evaluation
+Date: October 2026
+================================================================================
+
+1. LIVE APPLICATION & DEPLOYMENT LINKS
+--------------------------------------------------------------------------------
+• Live Render Deployed URL : https://volopay-assignment-inqe.onrender.com
+• Local Server Startup     : cd revenue-inbox && node server.js
+• Local Browser URL        : http://localhost:3000 (Zero external dependencies)
+• Standalone Offline Access: Open 'revenue-inbox/index.html' directly in any browser
+
+2. REPOSITORY & CODEBASE
+--------------------------------------------------------------------------------
+• GitHub Repository URL   : https://github.com/DineshMadhavanM/VOLOPAY_ASSIGNMENT.git
+• Branch                  : main
+• Visibility              : Private (per Assignment.pdf Non-Disclosure guidelines)
+
+3. ATTACHED SUBMISSION DELIVERABLES
+--------------------------------------------------------------------------------
+• 5-Slide Presentation Deck: presentation.pptx (inside slides/ folder)
+• 3-Minute Video Walkthrough: [See uploaded MP4 video in this Google Drive folder]
+• Video Recording Script    : DEMO_RECORDING_SCRIPT.md
+• Comprehensive Readme      : README.md (Setup, Replay Steps, Denominators, Findings)
+• Generated Manifests       : exports/manifest.json and exports/manifest.csv
+• Full Analysis Documents   : exports/ (44 markdown interaction files + daily brief)
+
+4. KEY EVALUATION HIGHLIGHTS (ASSIGNMENT COMPLIANCE)
+--------------------------------------------------------------------------------
+• Exact Record Count     : 44 total interactions (30 calls, 14 meetings)
+• Usable Coverage Jump   : 17/44 (38.6%) -> 18/44 (40.9%) after M07 late update (Rev 2)
+• Idempotence Verified   : Step 2 repeat import safely rejects 44 duplicates (0 inflation)
+• Preserved Overrides    : Manual route corrections on M07 survive batch replays and reloads
+• Call Reps vs Organizers: Clear mathematical distinction; denominators explicitly defined
+• Honest Uncertainty     : 26 records without audio transparently logged as 'No Audio Supplied'
+• Deliberately Rejected  : Refused to hallucinate ARR/pipeline forecasts without CRM data
+
+================================================================================

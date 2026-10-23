@@ -16,7 +16,7 @@ Date: October 2026
 --------------------------------------------------------------------------------
 • GitHub Repository URL   : https://github.com/DineshMadhavanM/VOLOPAY_ASSIGNMENT.git
 • Branch                  : main
-• Visibility              : Private (per Assignment.pdf Non-Disclosure guidelines)
+• Visibility              : Public
 
 3. ATTACHED SUBMISSION DELIVERABLES
 --------------------------------------------------------------------------------

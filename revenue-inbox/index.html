@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SpendNest — Revenue Intelligence Inbox</title>
+  <meta name="description" content="Executive Sales Manager Inbox for review, routing, evidence inspection and replay verification on SpendNest interaction records.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236366f1'><path d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="jszip.min.js"></script>
+</head>
+<body>
+
+  <!-- Ambient Parallax Mesh Canvas -->
+  <div class="parallax-container" id="parallax-bg" aria-hidden="true">
+    <div class="parallax-orb orb-1" data-speed="0.045"></div>
+    <div class="parallax-orb orb-2" data-speed="-0.035"></div>
+    <div class="parallax-orb orb-3" data-speed="0.025"></div>
+    <div class="parallax-grid-overlay"></div>
+  </div>
+
+  <!-- Dashboard Shell Layout: Left Sidebar + Main Content -->
+  <div class="dashboard-layout">
+
+    <!-- LEFT SIDEBAR: Executive Navigation, Actions & Replay Simulator -->
+    <aside class="dashboard-sidebar">
+      <!-- Brand Logo & System Info -->
+      <div class="sidebar-brand">
+        <div class="sidebar-brand-logo">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <div class="sidebar-brand-info">
+          <h2>SpendNest</h2>
+          <span class="sidebar-brand-badge">Revenue Intelligence</span>
+        </div>
+      </div>
+
+      <!-- Volopay Evaluation Badge -->
+      <div class="sidebar-edition-pill">
+        <span class="edition-pulse"></span>
+        <span>Volopay Evaluation Mode</span>
+      </div>
+
+      <!-- Navigation & Top Pages (All pages on the left) -->
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">Pages & Navigation</div>
+        <nav class="sidebar-nav main-nav">
+          <button class="nav-item active" data-tab="conversations">
+            <div class="nav-item-left">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
+              <span>Inbox Review</span>
+            </div>
+            <span class="nav-badge" id="sidebar-inbox-badge">44</span>
+          </button>
+
+          <button class="nav-item" data-tab="brief">
+            <div class="nav-item-left">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+              <span>Manager Brief</span>
+            </div>
+            <span class="nav-badge">Audit</span>
+          </button>
+
+          <button class="nav-item" data-tab="exports">
+            <div class="nav-item-left">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span>Export Center</span>
+            </div>
+            <span class="nav-badge">ZIP/CSV</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Data Contract Replay Controls (DATA_CONTRACT.md Verification) -->
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">Contract Verification</div>
+        <div class="sidebar-replay-steps">
+          <button id="btn-step-1" class="sidebar-step-btn replay-btn active" title="Step 1: Import 01_initial.json">1. Initial Import (Rev 1)</button>
+          <button id="btn-step-2" class="sidebar-step-btn replay-btn" title="Step 2: Repeat Import to test strict idempotence">2. Test Idempotence</button>
+          <button id="btn-step-3" class="sidebar-step-btn replay-btn warning" title="Step 3: Manually override a route on M07 or C06">3. Route Override (M07)</button>
+          <button id="btn-step-4" class="sidebar-step-btn replay-btn success" title="Step 4: Import 02_update.json with late transcript for M07">4. Ingest Late Rev 2</button>
+          <button id="btn-step-5" class="sidebar-step-btn replay-btn" title="Step 5: Re-import Rev 1 to confirm override & newer revision survive">5. Verify Preserved</button>
+          <label class="sidebar-step-btn replay-btn" style="cursor: pointer; display: flex; align-items: center; gap: 6px;" title="Upload custom test batch JSON">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            <span>Upload Batch JSON</span>
+            <input type="file" id="file-uploader" accept=".json" style="display: none;">
+          </label>
+          <button id="btn-reset" class="sidebar-step-btn replay-btn danger" title="Reset all state and overrides to fresh start">Reset Simulator</button>
+        </div>
+      </div>
+
+      <!-- Sidebar Footer -->
+      <div class="sidebar-footer">
+        <div class="sidebar-profile">
+          <div class="profile-avatar">SM</div>
+          <div>
+            <div class="profile-name">Sales Manager</div>
+            <div class="profile-meta">Audit & Inspection</div>
+          </div>
+        </div>
+        <button id="theme-toggle" class="theme-toggle-btn" title="Toggle Theme" aria-label="Toggle Dark/Light Mode">
+          <svg id="theme-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+    </aside>
+
+    <!-- RIGHT DASHBOARD MAIN -->
+    <div class="dashboard-main">
+
+      <!-- Dynamic Topbar Header -->
+      <header class="main-topbar" id="replay-toolbar">
+        <div class="main-topbar-title">
+          <h2 id="page-heading-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
+            <span id="topbar-view-title">Inbox Review & Conversation Routing</span>
+          </h2>
+          <p id="topbar-view-desc">Sales Activity Audit, Evidence Inspection & Replay Verification</p>
+        </div>
+
+        <div class="main-topbar-badges">
+          <div class="header-badge highlight">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span>21 August 2026 (Asia/Kolkata)</span>
+          </div>
+          <div class="header-badge">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            <span id="badge-record-count">44 Records Ingested</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Live Telemetry Status Strip -->
+      <div class="replay-log-strip" style="margin: 0; border-radius: 0; border-left: none; border-right: none; border-top: none;">
+        <div class="replay-log-text">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+          <span id="replay-status-message">State: Initial delivery ingested (44 records, 17 with transcripts, revision 1 applied).</span>
+        </div>
+        <div class="replay-metrics-mini">
+          <span>Unique IDs: <strong id="telemetry-unique-count">44</strong></span>
+          <span>Revision: <strong id="telemetry-revision">1</strong></span>
+          <span>Transcripts: <strong id="telemetry-transcripts">17/44 (38.6%)</strong></span>
+          <span>Overrides: <strong id="telemetry-overrides">0</strong></span>
+          <span>Rejected Dups: <strong id="telemetry-dups">0</strong></span>
+        </div>
+      </div>
+
+      <!-- Main Application Container -->
+      <main class="app-container">
+
+    <!-- Dashboard Headline Metrics Grid -->
+    <section class="metrics-grid">
+      <!-- Metric 1: Total Activity Records -->
+      <div class="metric-card glass accent-indigo">
+        <div class="metric-header">
+          <span class="metric-title">Selected Records</span>
+          <span class="metric-info-tooltip" title="Denominator: Distinct (source_type, source_id) pairs for local date 2026-08-21.">ⓘ</span>
+        </div>
+        <div class="metric-value-row">
+          <span class="metric-value" id="metric-total-records">44</span>
+          <span class="metric-denominator">interactions</span>
+        </div>
+        <div class="metric-subtext" id="metric-split-text">30 Calls &bull; 14 Meetings</div>
+        <div class="metric-progress">
+          <div class="metric-progress-fill" style="width: 100%; background: var(--brand-primary);"></div>
+        </div>
+      </div>
+
+      <!-- Metric 2: Usable Transcript Coverage -->
+      <div class="metric-card glass accent-cyan">
+        <div class="metric-header">
+          <span class="metric-title">Transcript Coverage</span>
+          <span class="metric-info-tooltip" title="Denominator: Total selected records (44). Usable text means non-blank call transcript or at least 1 meeting turn. Initially 17/44; after update 18/44.">ⓘ</span>
+        </div>
+        <div class="metric-value-row">
+          <span class="metric-value" id="metric-transcript-count">17</span>
+          <span class="metric-denominator">/ 44 (<span id="metric-transcript-pct">38.6%</span>)</span>
+        </div>
+        <div class="metric-subtext" id="metric-coverage-subtext">10 Calls &bull; 7 Meetings (M07 Pending)</div>
+        <div class="metric-progress">
+          <div class="metric-progress-fill" id="metric-coverage-bar" style="width: 38.6%; background: var(--accent-cyan);"></div>
+        </div>
+      </div>
+
+      <!-- Metric 3: Machine Connection vs Conversation -->
+      <div class="metric-card glass accent-emerald">
+        <div class="metric-header">
+          <span class="metric-title">Call Connection Rate</span>
+          <span class="metric-info-tooltip" title="Denominator: 30 calls with non-null is_connected flag. Compares machine-reported connect with actual multi-turn prospect dialogues.">ⓘ</span>
+        </div>
+        <div class="metric-value-row">
+          <span class="metric-value" id="metric-connect-rate">30.0%</span>
+          <span class="metric-denominator">(9 / 30 calls)</span>
+        </div>
+        <div class="metric-subtext">8 multi-turn prospect conversations</div>
+        <div class="metric-progress">
+          <div class="metric-progress-fill" style="width: 30%; background: var(--status-success);"></div>
+        </div>
+      </div>
+
+      <!-- Metric 4: Primary Routing Allocation -->
+      <div class="metric-card glass accent-amber">
+        <div class="metric-header">
+          <span class="metric-title">Routing Destinations</span>
+          <span class="metric-info-tooltip" title="Total primary route assignments across 44 records. Does not invent pipeline value where evidence is lacking.">ⓘ</span>
+        </div>
+        <div class="metric-value-row">
+          <span class="metric-value" id="metric-routing-assigned">6</span>
+          <span class="metric-denominator">categories</span>
+        </div>
+        <div class="metric-subtext" id="metric-routes-subtext">Deals: 5 &bull; CS: 3 &bull; Partners: 2</div>
+        <div class="metric-progress">
+          <div class="metric-progress-fill" style="width: 75%; background: var(--status-warning);"></div>
+        </div>
+      </div>
+
+      <!-- Metric 5: Review & Overrides -->
+      <div class="metric-card glass accent-purple">
+        <div class="metric-header">
+          <span class="metric-title">Review & Overrides</span>
+          <span class="metric-info-tooltip" title="Tracks records requiring manager attention or with active human overrides that must survive batch updates.">ⓘ</span>
+        </div>
+        <div class="metric-value-row">
+          <span class="metric-value" id="metric-override-count">0</span>
+          <span class="metric-denominator">overridden</span>
+        </div>
+        <div class="metric-subtext" id="metric-review-subtext">44 Records under audit governance</div>
+        <div class="metric-progress">
+          <div class="metric-progress-fill" id="metric-override-bar" style="width: 0%; background: var(--status-purple);"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Filters & Search Toolbar -->
+    <section class="filter-bar glass">
+      <div class="search-box">
+        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="filter-search" class="search-input" placeholder="Search interactions, rep, company, or ref... (Press '/' to focus)">
+        <span class="search-kbd-hint"><kbd>/</kbd></span>
+      </div>
+
+      <div class="filter-group">
+        <select id="filter-source-type" class="filter-select">
+          <option value="all">All Types (Calls & Meetings)</option>
+          <option value="call">Calls Only (30)</option>
+          <option value="meeting">Meetings Only (14)</option>
+        </select>
+
+        <select id="filter-rep" class="filter-select">
+          <option value="all">All People (Reps & Organisers)</option>
+          <option value="Arun">Arun (Rep: 12 dials)</option>
+          <option value="Meera">Meera (Rep: 6 dials)</option>
+          <option value="Leela">Leela (Rep: 8 dials)</option>
+          <option value="Dev">Dev (Rep: 1 dial)</option>
+          <option value="Kiran">Kiran (Rep: 1 dial)</option>
+          <option value="team06@example.com">team06 (Organiser: M01)</option>
+          <option value="team07@example.com">team07 (Organiser: M02)</option>
+          <option value="team08@example.com">team08 (Organiser: M03)</option>
+          <option value="team09@example.com">team09 (Organiser: M04, M07)</option>
+        </select>
+
+        <select id="filter-route" class="filter-select">
+          <option value="all">All Routes</option>
+          <option value="Deal Next Steps / Pipeline">Deal Next Steps / Pipeline</option>
+          <option value="Customer Success / Bug Escalation">Customer Success / Bug Escalation</option>
+          <option value="Customer Success / Account Migration">Customer Success / Account Migration</option>
+          <option value="Partnership / Channel Advisory">Partnership / Channel Advisory</option>
+          <option value="Vendor Evaluation / Internal">Vendor Evaluation / Internal</option>
+          <option value="Internal Enablement / Training">Internal Enablement / Training</option>
+          <option value="Low Priority / Rejected">Low Priority / Rejected</option>
+          <option value="Low Priority / Voicemail">Low Priority / Voicemail</option>
+          <option value="Intake / No Audio Supplied">Intake / No Audio Supplied</option>
+          <option value="Intake / Pending Transcript">Intake / Pending Transcript</option>
+        </select>
+
+        <select id="filter-state" class="filter-select">
+          <option value="all">All Processing States</option>
+          <option value="Analysed">Analysed (Substantive Text)</option>
+          <option value="Overridden">Manually Overridden</option>
+          <option value="No Audio">No Audio Supplied (26)</option>
+          <option value="Pending Transcript">Pending Transcript</option>
+        </select>
+
+        <span id="filter-results-counter" class="filter-count-badge">44 Records</span>
+        <button id="btn-clear-filters" class="clear-filters-btn">Reset Filters</button>
+      </div>
+    </section>
+
+    <!-- TAB 1: Conversations Inbox View -->
+    <section id="view-conversations" class="view-section active">
+      <div class="conversations-table-container glass">
+        <table class="conversations-table">
+          <thead>
+            <tr>
+              <th>Ref</th>
+              <th>Type</th>
+              <th>Company / Interaction Title</th>
+              <th>Rep / Organiser</th>
+              <th>Duration</th>
+              <th>Connected</th>
+              <th>Assigned Route</th>
+              <th>State</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="conversations-table-body">
+            <!-- Dynamically populated via app.js -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- TAB 2: Manager Daily Brief View -->
+    <section id="view-brief" class="view-section">
+      <div class="brief-container">
+        <div class="brief-main">
+          <!-- Daily Synthesis Card -->
+          <div class="brief-card glass">
+            <h3>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <span>Manager Daily Brief &bull; Friday, 21 August 2026 (Asia/Kolkata)</span>
+            </h3>
+            <p style="color: var(--text-secondary); margin-bottom: 16px;">
+              Consolidated intelligence across 44 interaction records (30 calls, 14 meetings) received on SpendNest. Out of 44 records, 18 contain substantive conversation text (post-M07 late delivery), while 26 represent short unrecorded dials or empty meetings.
+            </p>
+
+            <!-- Discrepancy Warnings -->
+            <div class="alert-box danger">
+              <strong>CRITICAL METADATA WARNING (Call C06):</strong> Record metadata specifies rep as <code>Meera</code>, but spoken audio intro explicitly states <em>"Good evening, Mr Nikhil... Ravi here. I'll say at the start that this is a cold call."</em> Recommend immediate audit of VOIP telephony extension mapping to avoid rep commission or coaching misallocation.
+            </div>
+
+            <div class="alert-box info">
+              <strong>VENDOR MISCLASSIFICATION PREVENTED (Meeting M02):</strong> Calendar title <em>"LedgerBridge / SpendNest discussion"</em> was mistagged as sales pipeline upstream. Analysis confirms SpendNest Strategy is evaluating LedgerBridge to purchase European e-invoicing compliance software. Successfully routed to <code>Vendor Evaluation / Internal</code> and excluded from sales pipeline.
+            </div>
+
+            <!-- Priority Deals -->
+            <h4 style="margin: 20px 0 10px 0; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--status-success);">
+              Priority Sales Deals & Next Steps
+            </h4>
+
+            <div class="brief-item">
+              <div class="brief-item-title">
+                <span>Asterloom Systems &mdash; Enterprise Deal (M03)</span>
+                <span class="badge badge-route-deals">High Intent</span>
+              </div>
+              <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 8px;">
+                Customer finance team (~65 employees, monthly vendor payments INR 26&ndash;39 lakh) requires corporate cards with dual-approval controls and finance pre-review before ERP synchronization.
+              </p>
+              <div style="font-size: 12px; color: var(--brand-primary); font-weight: 600;">
+                Next Action: Team member A to send tailored cards proposal and ERP sync workflow document for CFO review.
+              </div>
+            </div>
+
+            <div class="brief-item">
+              <div class="brief-item-title">
+                <span>Developer API Access Follow-Up &mdash; Milan (C03)</span>
+                <span class="badge badge-route-deals">Technical Pipeline</span>
+              </div>
+              <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 8px;">
+                Milan is price-sensitive but actively evaluating API access and webhook event notifications. Requested specific follow-up email before Monday call.
+              </p>
+              <div style="font-size: 12px; color: var(--brand-primary); font-weight: 600;">
+                Next Action: Kiran to email subject line "Developer access and event notifications — follow-up" with tiered developer pricing.
+              </div>
+            </div>
+
+            <div class="brief-item">
+              <div class="brief-item-title">
+                <span>Raghav Fulfillment Referral &mdash; Contact08 (C08)</span>
+                <span class="badge badge-route-deals">Warm Referral</span>
+              </div>
+              <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 8px;">
+                Contact Raghav referred rep to his colleague handling people operations and frontline location expenses at <code>contact08@example.com</code>.
+              </p>
+              <div style="font-size: 12px; color: var(--brand-primary); font-weight: 600;">
+                Next Action: Meera to email people operations lead referencing the conversation with Raghav.
+              </div>
+            </div>
+
+            <!-- Escalations & Retention -->
+            <h4 style="margin: 20px 0 10px 0; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--status-danger);">
+              Customer Retention & Escalations
+            </h4>
+
+            <div class="brief-item">
+              <div class="brief-item-title">
+                <span>Willowfield Trust &mdash; Bug Escalation (M07)</span>
+                <span class="badge badge-route-cs">Critical Bugs</span>
+              </div>
+              <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 8px;">
+                Customer screen-shared reproducible defects: event payment descriptions reverting after save; recreate payment file attachment upload failing.
+              </p>
+              <div style="font-size: 12px; color: var(--status-danger); font-weight: 600;">
+                Next Action: File urgent engineering tickets; Team member A to provide status report before EOD.
+              </div>
+            </div>
+
+            <div class="brief-item">
+              <div class="brief-item-title">
+                <span>Cedarwave Distribution &mdash; Migration & Credit Line (M04)</span>
+                <span class="badge badge-route-cs">Account Migration</span>
+              </div>
+              <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 8px;">
+                Customer holds an INR 1.3 crore bank credit line and suffers from prepaid card acceptance issues. Needs bank credit card feed connected to SpendNest and assistance fixing department structure.
+              </p>
+              <div style="font-size: 12px; color: var(--status-warning); font-weight: 600;">
+                Next Action: Check bank-card transaction feed eligibility with program team; schedule session to reorganize department user mapping.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar: Rep Coaching & Outbound Hygiene -->
+        <div class="brief-sidebar">
+          <div class="brief-card glass">
+            <h3>Rep Coaching Priorities</h3>
+
+            <div style="margin-bottom: 16px;">
+              <strong style="color: var(--text-primary); font-size: 13px;">Arun (12 Dials, 2 Voicemails, 1 Meeting)</strong>
+              <p style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+                High dial volume but 10 background dials under 31s with no audio. In C01, Pranav was angry at cold calling; coach rep on softer permission-based openers. In C04, verify bounced email addresses before sending sensitive platform collateral.
+              </p>
+            </div>
+
+            <div style="margin-bottom: 16px;">
+              <strong style="color: var(--text-primary); font-size: 13px;">Meera (6 Outbound Dials)</strong>
+              <p style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+                Strong qualification and discovery skills. Coaching alert for C09 & C10: ensure rep honors prospect boundaries (do not mention Vedant's name to Rishabh; do not call Aniket who asked for messaging only).
+              </p>
+            </div>
+
+            <div style="margin-bottom: 16px;">
+              <strong style="color: var(--text-primary); font-size: 13px;">Dev (1 Outbound Dial)</strong>
+              <p style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+                Excellent channel conversation (C07 with Aditya at Willowbank Advisory). Prepare standardized overseas partner one-pager for Monday's scheduled follow-up.
+              </p>
+            </div>
+
+            <div>
+              <strong style="color: var(--text-primary); font-size: 13px;">Leela (8 Dials - All Background)</strong>
+              <p style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+                All 8 dials (B02, B05, B06, B08, B11, B14, B16, B20) are short dials without transcripts. Manager should check whether Leela is handling inbound queue callbacks or administrative transfers.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: Export Center View -->
+    <section id="view-exports" class="view-section">
+      <div class="export-center-grid">
+        <div class="export-hero-card glass">
+          <h3 style="font-size: 18px; font-weight: 700; color: var(--brand-primary); margin-bottom: 8px;">
+            Export & Manifest Engine
+          </h3>
+          <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
+            Compliant with <code>DATA_CONTRACT.md</code>. Automatically produces organized directory structures, individual record analysis files, and machine-readable manifests.
+          </p>
+
+          <div class="export-stats-list">
+            <div class="export-stats-row">
+              <span style="color: var(--text-secondary);">Manifest Files:</span>
+              <strong style="color: var(--text-primary);">manifest.json &bull; manifest.csv</strong>
+            </div>
+            <div class="export-stats-row">
+              <span style="color: var(--text-secondary);">Generated Folders:</span>
+              <strong style="color: var(--accent-cyan);">6 Categorized Directories</strong>
+            </div>
+            <div class="export-stats-row">
+              <span style="color: var(--text-secondary);">Total Analysis Documents:</span>
+              <strong style="color: var(--status-success);">44 Markdown Records + Daily Brief</strong>
+            </div>
+            <div class="export-stats-row">
+              <span style="color: var(--text-secondary);">Contract Compliance:</span>
+              <strong style="color: var(--status-warning);">Identity: (source_type, source_id)</strong>
+            </div>
+          </div>
+
+          <button id="btn-download-zip" class="btn-download-zip">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span>Download Complete Export Archive (.zip)</span>
+          </button>
+        </div>
+
+        <div class="export-manifest-card glass" style="padding: 24px; border-radius: var(--radius-lg); overflow: hidden;">
+          <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary);">
+            Live Export Manifest Preview (manifest.json / manifest.csv)
+          </h4>
+          <div style="max-height: 380px; overflow-y: auto;">
+            <table class="conversations-table" style="font-size: 11px;">
+              <thead>
+                <tr>
+                  <th>Ref</th>
+                  <th>Type</th>
+                  <th>Rev</th>
+                  <th>Primary Route</th>
+                  <th>Output Path</th>
+                  <th>State</th>
+                  <th>Override</th>
+                </tr>
+              </thead>
+              <tbody id="export-manifest-table-body">
+                <!-- Dynamically populated via app.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Assessment Reviewer Artifacts & Slide Deck Link -->
+        <div class="export-hero-card glass" style="grid-column: 1 / -1; display: flex; flex-direction: column; gap: 14px; border-color: rgba(99, 102, 241, 0.25);">
+          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+            <div>
+              <h4 style="font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                <span>Assessment Deliverables & Presentation Artifacts</span>
+              </h4>
+              <p style="font-size: 12px; color: var(--text-secondary); margin: 0;">
+                All required evaluation materials: 5-Slide Executive Deck, 3-Minute Narration Script, and Findings Walkthrough.
+              </p>
+            </div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <a href="slides/slides.html" target="_blank" class="action-btn-sm" style="text-decoration: none; display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                <span>View 5 Slides (HTML)</span>
+              </a>
+              <a href="slides/presentation.pptx" download class="action-btn-sm" style="text-decoration: none; display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <span>Download Slides (.pptx)</span>
+              </a>
+              <a href="slides/SLIDES.md" target="_blank" class="action-btn-sm" style="text-decoration: none; display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px;">
+                <span>View SLIDES.md</span>
+              </a>
+              <a href="DEMO_RECORDING_SCRIPT.md" target="_blank" class="action-btn-sm" style="text-decoration: none; display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px;">
+                <span>Video Script (.md)</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+    </div> <!-- /.dashboard-main -->
+  </div> <!-- /.dashboard-layout -->
+
+  <!-- Deep Inspection Drawer / Slide-Over Modal -->
+  <div class="drawer-backdrop" id="drawer-backdrop"></div>
+  <aside class="drawer" id="inspection-drawer">
+    <div class="drawer-header">
+      <div class="drawer-title-area">
+        <h2 id="drawer-title">Inspection</h2>
+        <div class="drawer-meta-pills" id="drawer-meta-pills"></div>
+      </div>
+      <button class="drawer-close-btn" id="drawer-close-btn">&times;</button>
+    </div>
+
+    <div class="drawer-tabs">
+      <button class="drawer-tab active" data-drawer-tab="analysis">Analysis & Evidence</button>
+      <button class="drawer-tab" data-drawer-tab="transcript">Transcript (Turns)</button>
+      <button class="drawer-tab" data-drawer-tab="override">Manual Route Correction</button>
+    </div>
+
+    <div class="drawer-body">
+      <!-- Subtab 1: Analysis & Evidence -->
+      <div id="drawer-tab-content-analysis" class="drawer-subtab-content">
+        <div class="drawer-section">
+          <div class="drawer-section-title">1. Executive Summary & Why It Matters</div>
+          <p id="drawer-summary" style="font-size: 13px; line-height: 1.6; margin-bottom: 10px;"></p>
+          <div style="font-size: 12px; color: var(--accent-cyan);" id="drawer-why-matters"></div>
+        </div>
+
+        <div class="drawer-section">
+          <div class="drawer-section-title">
+            <span>2. Verified Source Evidence</span>
+            <span class="evidence-ref-tag" id="drawer-evidence-ref">Ref</span>
+          </div>
+          <div class="evidence-quote-box" id="drawer-evidence-quote"></div>
+        </div>
+
+        <div class="drawer-section">
+          <div class="drawer-section-title">3. What the Evidence Does NOT Establish (Boundaries & Honest Uncertainty)</div>
+          <p id="drawer-limitations" style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;"></p>
+        </div>
+
+        <div class="drawer-section">
+          <div class="drawer-section-title">4. Actionable Next Steps & Stated Ownership</div>
+          <div style="font-size: 13px; font-weight: 600; color: var(--status-success); margin-bottom: 4px;" id="drawer-next-steps"></div>
+          <div style="font-size: 12px; color: var(--text-muted);">Assigned Owner: <span id="drawer-owner" style="color: var(--text-primary); font-weight: 600;"></span></div>
+        </div>
+      </div>
+
+      <!-- Subtab 2: Formatted Transcript Turns -->
+      <div id="drawer-tab-content-transcript" class="drawer-subtab-content" style="display: none;">
+        <div id="drawer-transcript-container"></div>
+      </div>
+
+      <!-- Subtab 3: Route Override Form -->
+      <div id="drawer-tab-content-override" class="drawer-subtab-content" style="display: none;">
+        <div class="drawer-section">
+          <div class="drawer-section-title">Manager Route Override (Preserved Across Updates)</div>
+          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">
+            Under <code>DATA_CONTRACT.md</code>, an explicit human routing correction must supersede automated suggestions and survive batch replays, updates, and browser reloads.
+          </p>
+
+          <form id="override-form" class="override-form">
+            <div class="form-group">
+              <label class="form-label">Primary Route Category</label>
+              <select id="override-route-select" class="form-select">
+                <option value="Deal Next Steps / Pipeline">Deal Next Steps / Pipeline</option>
+                <option value="Customer Success / Bug Escalation">Customer Success / Bug Escalation</option>
+                <option value="Customer Success / Account Migration">Customer Success / Account Migration</option>
+                <option value="Partnership / Channel Advisory">Partnership / Channel Advisory</option>
+                <option value="Vendor Evaluation / Internal">Vendor Evaluation / Internal</option>
+                <option value="Internal Enablement / Training">Internal Enablement / Training</option>
+                <option value="Low Priority / Rejected">Low Priority / Rejected</option>
+                <option value="Low Priority / Voicemail">Low Priority / Voicemail</option>
+                <option value="Intake / No Audio Supplied">Intake / No Audio Supplied</option>
+                <option value="Intake / Pending Transcript">Intake / Pending Transcript</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Manager Decision Notes & Rationale</label>
+              <textarea id="override-notes" class="form-textarea" rows="4" placeholder="Explain the rationale for this manual correction..."></textarea>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+              <button type="submit" class="btn-primary" style="flex: 1;">Save Route Override</button>
+              <button type="button" id="btn-clear-override" class="clear-filters-btn" style="border: 1px solid var(--border-subtle);">Reset to Automated</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Main Application Logic -->
+  <script src="app.js"></script>
+</body>
+</html>
